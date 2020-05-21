@@ -1,0 +1,28 @@
+{
+  "name": "dummy-imager",
+  "version": "1.0.0",
+  "description": "Batch downloads images, resizes, compresses, and pushes to S3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ucayali/dummy-imager.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ucayali/dummy-imager/issues"
+  },
+  "homepage": "https://github.com/Ucayali/dummy-imager#readme",
+  "dependencies": {
+    "aws-sdk": "^2.682.0",
+    "axios": "^0.19.2",
+    "bluebird": "^3.7.2",
+    "compress-images": "^1.7.8",
+    "grunt": "^1.1.0",
+    "jimp": "^0.12.1",
+    "path": "^0.12.7"
+  }
+}
