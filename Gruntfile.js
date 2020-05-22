@@ -3,6 +3,7 @@ const axios = require('axios');
 const fs = require('fs');
 const Promise = require('bluebird');
 const jimp = require('jimp');
+const compress_images = require('compress-images');
 
 module.exports = function(grunt) {
 
@@ -109,8 +110,23 @@ module.exports = function(grunt) {
 
   grunt.registerTask('compress', 'Compress images for web use.', function() {
     var done = this.async();
-    grunt.log.write('Logging some stuff...').ok();
-    done();
+
+    fs.mkdir(grunt.config('tinyImage'), { recursive: true }, (err) => {
+      if (err) {
+        grunt.log.write(err).ok();
+      }
+      compress_images(
+        `${grunt.config('mediumImage')}*.{jpg,JPG,jpeg,JPEG,gif,png,svg}`,
+        grunt.config('tinyImage'),
+        {compress_force: false, statistic: true, autoupdate: true},
+        false,
+        {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
+        {png: {engine: 'pngquant', command: ['--quality=20-50']}},
+        {svg: {engine: 'svgo', command: '--multipass'}},
+        {gif: {engine: 'gif2webp', command: ['--colors', '64', '--use-col=web']}},
+        () => { done() }
+      );
+    });
   });
 
   grunt.registerTask('push', 'Upload webified images to S3.', function() {
