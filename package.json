@@ -22,6 +22,7 @@
     "bluebird": "^3.7.2",
     "compress-images": "^1.7.8",
     "grunt": "^1.1.0",
+    "grunt-shell": "^3.0.1",
     "jimp": "^0.12.1",
     "path": "^0.12.7",
     "pngquant-bin": "^5.0.2"

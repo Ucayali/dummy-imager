@@ -4,8 +4,12 @@ const fs = require('fs');
 const Promise = require('bluebird');
 const jimp = require('jimp');
 const compress_images = require('compress-images');
+var AWS = require('aws-sdk');
+
+AWS.config.update({region: 'us-east-2'});
 
 module.exports = function(grunt) {
+  grunt.loadNpmTasks('grunt-shell');
 
   grunt.initConfig({
     fullImage: path.join(__dirname, '/images/full/'),
@@ -13,7 +17,15 @@ module.exports = function(grunt) {
     tinyImage: path.join(__dirname, '/images/web/'),
     picList: [],
     targetSize: [160, 160],
-    bucket: '',
+    bucketParams: {
+      Bucket : 'sdcwebimages',
+      ACL : 'public-read'
+    },
+    shell: {
+      upload: {
+        command: bucket => `aws s3 cp ${grunt.config('tinyImage')} s3://${bucket}/ --recursive --acl public-read`,
+      }
+    }
   });
 
   grunt.registerTask('makelist', 'Put together paged responses from Lorem Picsum into a single array.', function() {
@@ -129,12 +141,25 @@ module.exports = function(grunt) {
     });
   });
 
-  grunt.registerTask('push', 'Upload webified images to S3.', function() {
+  grunt.registerTask('makebucket', 'Make the bucket in S3.', function() {
     var done = this.async();
-    grunt.log.write('Logging some stuff...').ok();
-    done();
+
+    s3 = new AWS.S3({apiVersion: '2006-03-01'});
+
+    s3.createBucket(grunt.config('bucketParams'), function(err, data) {
+      if (err) {
+        console.log("Error", err);
+        done();
+      } else {
+        console.log("Success", data.Location);
+        done();
+      }
+    });
   });
 
-  grunt.registerTask('dummy', 'Download, process, and host dummy images', ['makelist','fetch', 'resize', 'compress', 'push']);
+  grunt.registerTask('push', 'Upload webified images to S3', [`shell:upload:${grunt.config('bucketParams').Bucket}`]);
+
+
+  grunt.registerTask('dummy', 'Download, process, and host dummy images', ['makelist','fetch', 'resize', 'compress', 'makebucket', 'push']);
 
 };
